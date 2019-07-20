@@ -5,10 +5,7 @@
       <img class="icon" src="./assets/delete.svg" alt="delete" />
     </div>
 
-    <Stack
-      :cards="visibleCards"
-      @swipeCard="swipeCard"
-    />
+    <Stack :cards="visibleCards" @swipeCard="swipeCard" />
   </div>
 </template>
 
@@ -23,7 +20,11 @@ export default {
 
   data() {
     return {
-      visibleCards: [{factoid: "Card 1"}, {factoid: "Card 2"}, {factoid: "Card 3"}]
+      visibleCards: [
+        { factoid: "Card 1" },
+        { factoid: "Card 2" },
+        { factoid: "Card 3" }
+      ]
     };
   },
 
