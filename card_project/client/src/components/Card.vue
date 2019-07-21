@@ -11,7 +11,24 @@
     v-touch:moving="mouseMoving"
     v-touch:end="mouseEnd"
   >
-    <p>{{ factoid }}</p>
+    <div class="photo-container">
+      <img
+        class="photo"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Heart_coraz%C3%B3n.svg/1920px-Heart_coraz%C3%B3n.svg.png"
+        alt="card image"
+      />
+    </div>
+
+    <div class="text-container">
+      <p>
+        <b>Description:</b>
+        {{ description }}
+      </p>
+      <p>
+        <b>Factoid:</b>
+        {{ factoid }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -25,6 +42,10 @@ export default {
   props: {
     index: {
       type: Number,
+      required: true
+    },
+    description: {
+      type: String,
       required: true
     },
     factoid: {
@@ -108,5 +129,29 @@ export default {
   width: 100%;
   border-radius: 30px;
   cursor: pointer;
+}
+
+.photo-container {
+  position: relative;
+  overflow: hidden;
+  height: 40%;
+  width: 80%;
+  padding: 0 10%;
+  margin: 10% 0;
+}
+.photo {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.text-container {
+  position: relative;
+  overflow: hidden;
+  height: 40%;
+  width: 80%;
+  margin: 0;
+  padding: 0 10%;
 }
 </style>

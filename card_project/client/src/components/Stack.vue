@@ -2,8 +2,9 @@
   <div class="cards">
     <Card
       v-for="(card, index) in cards"
-      :key="card"
+      :key="card.id"
       :index="cards.length - index"
+      :description="card.description"
       :factoid="card.factoid"
       @swipeCard="$emit('swipeCard')"
     />

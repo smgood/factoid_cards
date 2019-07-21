@@ -1,16 +1,22 @@
 <template>
   <div id="app">
     <div class="menu">
-      <img class="icon" src="./assets/add.svg" alt="add" />
-      <img class="icon" src="./assets/delete.svg" alt="delete" />
+      <button>
+        <img class="icon" src="./assets/add.svg" alt="add" />
+      </button>
+
+      <button v-on:click="removePost">
+        <img class="icon" src="./assets/delete.svg" alt="delete" />
+      </button>
     </div>
 
-    <Stack :cards="visibleCards" @swipeCard="swipeCard" />
+    <Stack :cards="cards" @swipeCard="swipeCard" />
   </div>
 </template>
 
 <script>
 import Stack from "./components/Stack";
+import api from "@/api";
 
 export default {
   name: "App",
@@ -20,17 +26,29 @@ export default {
 
   data() {
     return {
-      visibleCards: [
-        { factoid: "Card 1" },
-        { factoid: "Card 2" },
-        { factoid: "Card 3" }
-      ]
+      cards: []
     };
+  },
+
+  async created() {
+    this.refreshPosts();
   },
 
   methods: {
     swipeCard() {
-      this.visibleCards.push(this.visibleCards.shift());
+      this.cards.push(this.cards.shift());
+    },
+
+    async removePost() {
+      await api.deleteCard(this.cards[0].id);
+      this.refreshPosts();
+    },
+
+    async refreshPosts() {
+      let response = await api.getCards();
+      if (response) {
+        this.cards = response.cards;
+      }
     }
   }
 };
@@ -45,6 +63,17 @@ body {
   justify-content: center;
   margin: 0;
   padding: 0;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: inherit;
+  position: relative;
+  margin: 10px;
+  vertical-align: middle;
 }
 
 #app {
@@ -62,9 +91,6 @@ body {
 }
 
 .icon {
-  position: relative;
   height: 30px;
-  padding: 10px;
-  vertical-align: middle;
 }
 </style>
