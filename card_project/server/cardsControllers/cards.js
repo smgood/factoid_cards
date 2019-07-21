@@ -1,29 +1,59 @@
-/* eslint-disable class-methods-use-this */
-import db from '../db/db';
+const AWS = require("aws-sdk");
+const uuidv1 = require('uuid/v1');
+
+AWS.config.update({
+  region: "us-west-2",
+  endpoint: "http://localhost:8000"
+});
+
+let docClient = new AWS.DynamoDB.DocumentClient();
+let table = "Cards";
 
 class CardsController {
   getAllCards(req, res) {
-    return res.status(200).send({
-      success: 'true',
-      message: 'Cards retrieved successfully',
-      cards: db,
+    let params = {
+        TableName : table,
+    };
+
+    docClient.scan(params, function(err, data) {
+        if (err) {
+            console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
+            return res.status(400).send({
+              success: 'false',
+              message: 'Unable to query cards',
+            });
+        } else {
+            console.log("Query succeeded.");
+            return res.status(200).send({
+              success: 'true',
+              message: 'Cards retrieved successfully',
+              cards: data.Items,
+            });
+        }
     });
   }
 
   getCard(req, res) {
-    const id = parseInt(req.params.id, 10);
-    db.map((card) => {
-      if (card.id === id) {
-        return res.status(200).send({
-          success: 'true',
-          message: 'Card retrieved successfully',
-          card,
-        });
-      }
-    });
-    return res.status(404).send({
-      success: 'false',
-      message: 'Card does not exist',
+    let params = {
+        TableName: table,
+        Key:{ "id": req.params.id }
+    };
+
+    docClient.get(params, function(err, data) {
+        if (err) {
+            console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+            return res.status(404).send({
+              success: 'false',
+              message: 'Card not found',
+            });
+        } else {
+            console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
+            return res.status(200).send({
+              success: 'true',
+              message: 'Card retrieved successfully',
+              card: data.Item,
+            });
+        }
     });
   }
 
@@ -39,37 +69,36 @@ class CardsController {
         message: 'factoid is required',
       });
     }
-    const card = {
-      id: db.length + 1,
-      description: req.body.description,
-      factoid: req.body.factoid,
+
+    let params = {
+        TableName: table,
+        Item: {
+          "id": uuidv1(),
+          "date": Date.now(),
+          "description": req.body.description,
+          "factoid": req.body.factoid,
+        }
     };
-    db.push(card);
-    return res.status(201).send({
-      success: 'true',
-      message: 'Card added successfully',
-      card,
+
+    console.log("Adding a new item...");
+    docClient.put(params, function(err, data) {
+        if (err) {
+            console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
+            return res.status(400).send({
+              success: 'false',
+              message: 'Unable to create card',
+            });
+        } else {
+            console.log("Added item:", JSON.stringify(data, null, 2));
+            return res.status(201).send({
+              success: 'true',
+              message: 'Card added successfully',
+            });
+        }
     });
   }
 
   updateCard(req, res) {
-    const id = parseInt(req.params.id, 10);
-    let cardFound;
-    let itemIndex;
-    db.map((card, index) => {
-      if (card.id === id) {
-        cardFound = card;
-        itemIndex = index;
-      }
-    });
-
-    if (!cardFound) {
-      return res.status(404).send({
-        success: 'false',
-        message: 'Card not found',
-      });
-    }
-
     if (!req.body.description) {
       return res.status(400).send({
         success: 'false',
@@ -82,43 +111,57 @@ class CardsController {
       });
     }
 
-    const newCard = {
-      id: cardFound.id,
-      description: req.body.description || cardFound.description,
-      factoid: req.body.factoid || cardFound.factoid,
+    let params = {
+        TableName:table,
+        Key:{ "id": req.params.id },
+        UpdateExpression: "set description = :d, factoid=:f",
+        ExpressionAttributeValues:{
+            ":d":req.body.description,
+            ":f":req.body.factoid
+        },
+        ReturnValues:"ALL_NEW"
     };
 
-    db.splice(itemIndex, 1, newCard);
-
-    return res.status(201).send({
-      success: 'true',
-      message: 'Card added successfully',
-      newCard,
+    console.log("Updating the item...");
+    docClient.update(params, function(err, data) {
+        if (err) {
+            console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
+            return res.status(404).send({
+              success: 'false',
+              message: 'Card not found',
+            });
+        } else {
+            console.log("UpdateItem succeeded:", JSON.stringify(data, null, 2));
+            return res.status(201).send({
+              success: 'true',
+              message: 'Card updated successfully',
+              card: data.Attributes,
+            });
+        }
     });
   }
 
   deleteCard(req, res) {
-    const id = parseInt(req.params.id, 10);
-    let cardFound;
-    let itemIndex;
-    db.map((card, index) => {
-      if (card.id === id) {
-        cardFound = card;
-        itemIndex = index;
-      }
-    });
+    let params = {
+        TableName:table,
+        Key:{ "id": req.params.id },
+    };
 
-    if (!cardFound) {
-      return res.status(404).send({
-        success: 'false',
-        message: 'Card not found',
-      });
-    }
-    db.splice(itemIndex, 1);
-
-    return res.status(200).send({
-      success: 'true',
-      message: 'Card deleted successfuly',
+    console.log("Attempting a conditional delete...");
+    docClient.delete(params, function(err, data) {
+        if (err) {
+            console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
+            return res.status(404).send({
+              success: 'false',
+              message: 'Card not found',
+            });
+        } else {
+            console.log("DeleteItem succeeded:", JSON.stringify(data, null, 2));
+            return res.status(200).send({
+              success: 'true',
+              message: 'Card deleted successfuly',
+            });
+        }
     });
   }
 }
