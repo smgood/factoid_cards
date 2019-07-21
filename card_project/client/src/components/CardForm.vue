@@ -76,6 +76,7 @@ textarea {
   width: 100%;
   resize: none;
   background: none;
+  color: white;
 }
 
 .cards {
