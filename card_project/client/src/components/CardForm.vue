@@ -25,7 +25,7 @@
           <textarea
             v-model="factoid"
             rows="4"
-            placeholder="Enter description"
+            placeholder="Enter factoid"
             required
           >
           </textarea>
