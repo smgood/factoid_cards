@@ -80,7 +80,7 @@ textarea {
 
 .cards {
   position: relative;
-  height: calc(100% - 50px);
+  height: 100%;
 }
 
 .card {
@@ -88,7 +88,6 @@ textarea {
   height: 100%;
   width: 100%;
   border-radius: 30px;
-  cursor: pointer;
 }
 
 .photo-container {
@@ -97,7 +96,7 @@ textarea {
   height: 40%;
   width: 80%;
   padding: 0 10%;
-  margin: 10% 0;
+  margin: calc(5% + 50px) 0 5% 0;
 }
 
 .photo {
@@ -110,7 +109,7 @@ textarea {
 .text-container {
   position: relative;
   overflow: hidden;
-  height: 40%;
+  height: calc(50% - 50px);
   width: 80%;
   margin: 0;
   padding: 0 10%;

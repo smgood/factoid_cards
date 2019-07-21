@@ -11,6 +11,16 @@
     v-touch:moving="mouseMoving"
     v-touch:end="mouseEnd"
   >
+    <div class="menu">
+      <button v-on:click="showForm">
+        <img class="icon" src="../assets/add.svg" alt="add" />
+      </button>
+
+      <button v-on:click="removeCard">
+        <img class="icon" src="../assets/delete.svg" alt="delete" />
+      </button>
+    </div>
+
     <div class="photo-container">
       <img
         class="photo"
@@ -117,6 +127,16 @@ export default {
         this.$emit("swipeCard", this.card);
         this.cardPosition.x = 0;
       }, 100);
+    },
+
+    showForm() {
+      this.isMoving = false;
+      this.$emit("showForm");
+    },
+
+    removeCard() {
+      this.isMoving = false;
+      this.$emit("removeCard");
     }
   }
 };
@@ -128,7 +148,27 @@ export default {
   height: 100%;
   width: 100%;
   border-radius: 30px;
+}
+
+.menu {
+  position: relative;
+  width: 100%;
+  text-align: right;
+}
+
+.menu button {
+  background: none;
+  border: none;
+  padding: 0;
   cursor: pointer;
+  outline: inherit;
+  position: relative;
+  margin: 10px;
+  vertical-align: middle;
+}
+
+.icon {
+  height: 30px;
 }
 
 .photo-container {
@@ -138,7 +178,7 @@ export default {
   height: 40%;
   width: 80%;
   padding: 0 10%;
-  margin: 10% 0;
+  margin: 5% 0;
 }
 .photo {
   position: relative;

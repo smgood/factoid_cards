@@ -7,6 +7,8 @@
       :description="card.description"
       :factoid="card.factoid"
       @swipeCard="$emit('swipeCard')"
+      @removeCard="$emit('removeCard')"
+      @showForm="$emit('showForm')"
     />
   </div>
 </template>
@@ -31,6 +33,6 @@ export default {
 <style lang="scss" scoped>
 .cards {
   position: relative;
-  height: calc(100% - 50px);
+  height: 100%;
 }
 </style>

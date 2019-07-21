@@ -1,22 +1,17 @@
 <template>
   <div id="app">
-    <div class="menu">
-      <button v-on:click="showForm">
-        <img class="icon" src="./assets/add.svg" alt="add" />
-      </button>
-
-      <button v-on:click="removePost">
-        <img class="icon" src="./assets/delete.svg" alt="delete" />
-      </button>
-    </div>
-
     <CardForm
       v-if="showCardForm"
       @submitForm="submitForm"
       @hideForm="hideForm"
     />
 
-    <Stack v-else :cards="cards" @swipeCard="swipeCard" />
+    <Stack v-else
+      :cards="cards"
+      @swipeCard="swipeCard"
+      @removeCard="removeCard"
+      @showForm="showForm"
+    />
   </div>
 </template>
 
@@ -36,7 +31,7 @@ export default {
   data() {
     return {
       cards: [],
-      showCardForm: false
+      toggleCardForm: false
     };
   },
 
@@ -50,11 +45,11 @@ export default {
     },
 
     showForm() {
-      this.showCardForm = true;
+      this.toggleCardForm = true;
     },
 
     hideForm() {
-      this.showCardForm = false;
+      this.toggleCardForm = false;
     },
 
     async submitForm(data) {
@@ -63,7 +58,7 @@ export default {
       this.refreshPosts();
     },
 
-    async removePost() {
+    async removeCard() {
       await api.deleteCard(this.cards[0].id);
       this.refreshPosts();
     },
@@ -73,6 +68,12 @@ export default {
       if (response) {
         this.cards = response.cards;
       }
+    }
+  },
+
+  computed: {
+    showCardForm(){
+      return this.toggleCardForm || !this.cards.length;
     }
   }
 };
@@ -95,26 +96,5 @@ body {
   height: 100%;
   width: 100%;
   max-width: 50vh;
-}
-
-.menu {
-  position: relative;
-  width: 100%;
-  text-align: right;
-}
-
-.menu button {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  outline: inherit;
-  position: relative;
-  margin: 10px;
-  vertical-align: middle;
-}
-
-.icon {
-  height: 30px;
 }
 </style>
