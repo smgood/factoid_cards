@@ -134,6 +134,7 @@ export default {
 .photo-container {
   position: relative;
   overflow: hidden;
+  pointer-events: none;
   height: 40%;
   width: 80%;
   padding: 0 10%;
@@ -149,6 +150,7 @@ export default {
 .text-container {
   position: relative;
   overflow: hidden;
+  pointer-events: none;
   height: 40%;
   width: 80%;
   margin: 0;
